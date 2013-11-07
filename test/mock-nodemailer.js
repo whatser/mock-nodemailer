@@ -38,8 +38,17 @@ suite('mock-nodemailer', function() {
             }
         }, done);
 
-        email.send(function() {
-            // must never be called
+        email.send(function(err) {
+            assert.equal( err, null, 'done function should be called' );
         });
     });
+
+    test('mock-nodemailer should check n times send', function(done) {
+       done();
+    });
+
+    test('mock-nodemailer should handle concurrency (async.js)', function(done) {
+       done();
+    });
+
 });
