@@ -1,0 +1,35 @@
+{
+    "name": "mock-nodemailer",
+    "version": "0.0.1",
+    "description": "Mock nodemailer in tests",
+    "main": "./index.js",
+    "repository": {
+        "type": "git",
+        "url": "git@github.com:whatser/mock-nodemailer.git"
+    },
+    "keywords": [
+    "mock",
+    "test",
+    "email",
+    "nodemailer",
+    "smtp"
+  ],
+    "dependencies": {
+        "lodash": ">=1.2.1",
+        "nodemailer": ">=0.5.5"
+    },
+    "devDependencies": {
+        "async": ">=0.2.9",
+        "Faker": "~0.5.11",
+        "mocha": ">=1.9.0",
+        "js-beautify": ">=1.2.0",
+        "jshint": "*"
+    },
+    "scripts": {
+        "test": "./node_modules/mocha/bin/mocha -u tdd -R spec test"
+    },
+    "author": "Whatser B.V.",
+    "license": "BSD",
+    "readmeFilename": "README.md",
+    "gitHead": ""
+}
