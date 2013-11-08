@@ -4,6 +4,7 @@ var _ = require('lodash'),
     nodemailer = require('nodemailer'),
     Faker = require('Faker'),
     assert = require('assert'),
+    async = require('async'),
     mockMailer = require('../index'),
     transport = nodemailer.createTransport('Sendmail', '');
 
@@ -121,48 +122,49 @@ suite('expectEmail-nodemailer', function() {
     });
 
     test('should handle multiple emails in one test', function(done) {
-        var emailDone = function() {
-            emailDone = done;
-        };
-
         var email = {
             to: Faker.Internet.email(),
             text: Faker.Lorem.sentence(),
             subject: Faker.Lorem.sentence()
         };
-        mockMailer.expectEmail(email, function() {
-            emailDone();
-        });
-
         var email2 = {
             to: Faker.Internet.email(),
             text: Faker.Lorem.sentence(),
             subject: Faker.Lorem.sentence()
         };
-        mockMailer.expectEmail(email2, function() {
-            emailDone();
-        });
+
+        async.parallel([
+
+            function(done) {
+                mockMailer.expectEmail(email, done);
+            },
+            function(done) {
+                mockMailer.expectEmail(email2, done);
+            }
+
+        ], done);
 
         transport.sendMail(email, function() {});
         transport.sendMail(email2, function() {});
     });
 
     test('should handle multiple identical emails in one test', function(done) {
-        var emailDone = function() {
-            emailDone = done;
-        };
-
         var email = {
             to: Faker.Internet.email(),
             text: Faker.Lorem.sentence(),
             subject: Faker.Lorem.sentence()
         };
-        mockMailer.expectEmail(email, function() {
-            emailDone();
-        });
-        mockMailer.expectEmail(email, function() {
-            emailDone();
-        });
+
+        async.parallel([
+
+            function(done) {
+                mockMailer.expectEmail(email, done);
+            },
+            function(done) {
+                mockMailer.expectEmail(email, done);
+            }
+
+        ], done);
 
         transport.sendMail(email, function() {});
         transport.sendMail(email, function() {});
