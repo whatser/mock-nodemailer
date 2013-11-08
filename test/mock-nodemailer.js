@@ -66,11 +66,13 @@ suite('expectEmail-nodemailer', function() {
             subject: Faker.Lorem.sentence()
         };
 
-        mockMailer.expectEmail(5, function(sentEmail) {
+        var amount = 5 + Faker.random.number(8);
+
+        mockMailer.expectEmail(amount, function(sentEmail) {
             return _.isEqual(email, sentEmail);
         }, done);
 
-        _.times(5, function() {
+        _.times(amount, function() {
             transport.sendMail(email, function() {});
         });
     });
@@ -82,9 +84,11 @@ suite('expectEmail-nodemailer', function() {
             subject: Faker.Lorem.sentence()
         };
 
-        mockMailer.expectEmail(5, email, done);
+        var amount = 5 + Faker.random.number(8);
 
-        _.times(5, function(i) {
+        mockMailer.expectEmail(amount, email, done);
+
+        _.times(amount, function(i) {
             setTimeout(function() {
                 transport.sendMail(email, function() {});
             }, 100 * i);
