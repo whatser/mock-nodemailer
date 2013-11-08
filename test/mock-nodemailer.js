@@ -35,7 +35,7 @@ suite('expectEmail-nodemailer', function() {
         transport.sendMail(email, function() {});
     });
 
-    test('should throw with incorrect email, returning false', function(done) {
+    test('should throw with unexpected email, returning false', function(done) {
         var email = {
             to: Faker.Internet.email(),
             text: Faker.Lorem.sentence(),
@@ -53,7 +53,7 @@ suite('expectEmail-nodemailer', function() {
 
         assert.throws(function() {
             transport.sendMail(email2, function() {});
-        }, /incorrect email/);
+        }, /unexpected email/);
 
         done();
     });
@@ -117,7 +117,7 @@ suite('expectEmail-nodemailer', function() {
 
         assert.throws(function() {
             transport.sendMail(email, function() {});
-        }, /incorrect email/);
+        }, /unexpected email/);
     });
 
     test('should handle multiple emails in one test', function(done) {
