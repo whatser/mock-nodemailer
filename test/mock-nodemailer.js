@@ -10,7 +10,6 @@ var _ = require('lodash'),
 suite('mock-nodemailer', function() {
 
     test('should handle correct email, as object', function(done) {
-
         var email = {
             to: Faker.Internet.email(),
             text: Faker.Lorem.sentence(),
@@ -20,11 +19,9 @@ suite('mock-nodemailer', function() {
         mockMailer.mock(email, done);
 
         transport.sendMail(email, function() {});
-
     });
 
     test('should handle correct email, returning true', function(done) {
-
         var email = {
             to: Faker.Internet.email(),
             text: Faker.Lorem.sentence(),
@@ -37,11 +34,9 @@ suite('mock-nodemailer', function() {
         }, done);
 
         transport.sendMail(email, function() {});
-
     });
 
     test('should throw with incorrect email, returning false', function(done) {
-
         var email = {
             to: Faker.Internet.email(),
             text: Faker.Lorem.sentence(),
@@ -62,11 +57,9 @@ suite('mock-nodemailer', function() {
         }, /incorrect email/);
 
         done();
-
     });
 
     test('should throw with incorrect email, throwing an error', function(done) {
-
         var email = {
             to: Faker.Internet.email(),
             text: Faker.Lorem.sentence(),
@@ -88,11 +81,9 @@ suite('mock-nodemailer', function() {
         }, /incorrect email/);
 
         done();
-
     });
 
     test('should handle multiple emails', function(done) {
-
         var email = {
             to: Faker.Internet.email(),
             text: Faker.Lorem.sentence(),
@@ -106,7 +97,6 @@ suite('mock-nodemailer', function() {
         _.times(5, function() {
             transport.sendMail(email, function() {});
         });
-
     });
 
     test('should handle async mailing', function(done) {
@@ -201,6 +191,36 @@ suite('mock-nodemailer', function() {
 
         transport.sendMail(email, function() {});
         transport.sendMail(email, function() {});
+    });
+
+    test('sendMail callback shouldn\'t get an error', function(done) {
+        var email = {
+            to: Faker.Internet.email(),
+            text: Faker.Lorem.sentence(),
+            subject: Faker.Lorem.sentence()
+        };
+
+        mockMailer.mock(email, done);
+
+        transport.sendMail(email, function(error) {
+            assert.strictEqual(null, error);
+        });
+    });
+
+    test('sendMail callback should get a populated response', function(done) {
+        var email = {
+            to: Faker.Internet.email(),
+            text: Faker.Lorem.sentence(),
+            subject: Faker.Lorem.sentence()
+        };
+
+        mockMailer.mock(email, done);
+
+        transport.sendMail(email, function(error, response) {
+            assert(response, 'callback gets a response');
+            assert(response.message, 'response has a message');
+            assert(response.messageId, 'response has a message id');
+        });
     });
 
 });
