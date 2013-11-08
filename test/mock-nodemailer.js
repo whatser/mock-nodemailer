@@ -19,7 +19,27 @@ suite('expectEmail-nodemailer', function() {
 
         mockMailer.expectEmail(email, done);
 
+        email.from = Faker.Internet.email();
+
         transport.sendMail(email, function() {});
+    });
+
+    test('should throw with unexpected email, changed later', function(done) {
+        var email = {
+            to: Faker.Internet.email(),
+            text: Faker.Lorem.sentence(),
+            subject: Faker.Lorem.sentence()
+        };
+
+        mockMailer.expectEmail(email, done);
+
+        email.to = Faker.Internet.email();
+
+        assert.throws(function() {
+            transport.sendMail(email, function() {});
+        }, /unexpected email/);
+
+        done();
     });
 
     test('should handle correct email, returning true', function(done) {
