@@ -1,54 +1,206 @@
 'use strict';
 
-var nodemailer = require('nodemailer'),
+var _ = require('lodash'),
+    nodemailer = require('nodemailer'),
     Faker = require('Faker'),
     assert = require('assert'),
-    mockMailer = require('../index');
-
-var SimpleEmail = function(to, text, subject) {
-    var message = {
-        from: 'Whatser Mailer <no-reply@whatser.com>',
-        to: to,
-        text: text,
-        subject: subject
-    };
-
-    this.send = function(done) {
-        var transport = nodemailer.createTransport('Sendmail', '/usr/sbin/sendmail');
-
-        transport.sendMail(message, done);
-    };
-
-};
+    mockMailer = require('../index'),
+    transport = nodemailer.createTransport('Sendmail', '/usr/sbin/sendmail');
 
 suite('mock-nodemailer', function() {
-    test('mock-nodemailer should override the sendMail function', function(done) {
-        var to = Faker.Internet.email(),
-            message = Faker.Lorem.sentence(),
-            subject = Faker.Lorem.sentence();
 
-        var email = new SimpleEmail(to, message, subject);
+    test('should handle correct email, as object', function(done) {
 
-        mockMailer.mock(function(mail) {
-            if (mail.to === to) {
-                assert.equal(mail.subject, subject, 'Matching mail subject is the same');
-                assert.equal(mail.text, message, 'Matching mail text is the same');
+        var email = {
+            to: Faker.Internet.email(),
+            text: Faker.Lorem.sentence(),
+            subject: Faker.Lorem.sentence()
+        };
 
-                return true;
-            }
+        mockMailer.mock(email, done);
+
+        transport.sendMail(email, function() {});
+
+    });
+
+    test('should handle correct email, returning true', function(done) {
+
+        var email = {
+            to: Faker.Internet.email(),
+            text: Faker.Lorem.sentence(),
+            subject: Faker.Lorem.sentence()
+        };
+
+        mockMailer.mock(function(sentEmail) {
+            assert.deepEqual(email, sentEmail);
+            return true;
         }, done);
 
-        email.send(function(err) {
-            assert.equal( err, null, 'done function should be called' );
+        transport.sendMail(email, function() {});
+
+    });
+
+    test('should throw with incorrect email, returning false', function(done) {
+
+        var email = {
+            to: Faker.Internet.email(),
+            text: Faker.Lorem.sentence(),
+            subject: Faker.Lorem.sentence()
+        };
+        var email2 = {
+            to: Faker.Internet.email(),
+            text: Faker.Lorem.sentence(),
+            subject: Faker.Lorem.sentence()
+        };
+
+        mockMailer.mock(function(sentEmail) {
+            return _.isEqual(email, sentEmail);
+        }, done);
+
+        assert.throws(function() {
+            transport.sendMail(email2, function() {});
+        }, /incorrect email/);
+
+        done();
+
+    });
+
+    test('should throw with incorrect email, throwing an error', function(done) {
+
+        var email = {
+            to: Faker.Internet.email(),
+            text: Faker.Lorem.sentence(),
+            subject: Faker.Lorem.sentence()
+        };
+        var email2 = {
+            to: Faker.Internet.email(),
+            text: Faker.Lorem.sentence(),
+            subject: Faker.Lorem.sentence()
+        };
+
+        mockMailer.mock(function(sentEmail) {
+            assert.deepEqual(email, sentEmail);
+            return true;
+        }, done);
+
+        assert.throws(function() {
+            transport.sendMail(email2, function() {});
+        }, /incorrect email/);
+
+        done();
+
+    });
+
+    test('should handle multiple emails', function(done) {
+
+        var email = {
+            to: Faker.Internet.email(),
+            text: Faker.Lorem.sentence(),
+            subject: Faker.Lorem.sentence()
+        };
+
+        mockMailer.mock(5, function(sentEmail) {
+            return _.isEqual(email, sentEmail);
+        }, done);
+
+        _.times(5, function() {
+            transport.sendMail(email, function() {});
+        });
+
+    });
+
+    test('should handle async mailing', function(done) {
+        var email = {
+            to: Faker.Internet.email(),
+            text: Faker.Lorem.sentence(),
+            subject: Faker.Lorem.sentence()
+        };
+
+        mockMailer.mock(5, email, done);
+
+        _.times(5, function(i) {
+            setTimeout(function() {
+                transport.sendMail(email, function() {});
+            }, 100 * i);
         });
     });
 
-    test('mock-nodemailer should check n times send', function(done) {
-       done();
+    test('should handle concurrency', function(done) {
+        var email = {
+            to: Faker.Internet.email(),
+            text: Faker.Lorem.sentence(),
+            subject: Faker.Lorem.sentence()
+        };
+
+        mockMailer.mock(email, done);
+
+        setTimeout(function() {
+            transport.sendMail(email, function() {});
+        }, 200);
     });
 
-    test('mock-nodemailer should handle concurrency (async.js)', function(done) {
-       done();
+    test('should throw an error when too many emails were sent', function(done) {
+        var email = {
+            to: Faker.Internet.email(),
+            text: Faker.Lorem.sentence(),
+            subject: Faker.Lorem.sentence()
+        };
+
+        mockMailer.mock(email, done);
+
+        transport.sendMail(email, function() {});
+
+        assert.throws(function() {
+            transport.sendMail(email, function() {});
+        }, /incorrect email/);
+    });
+
+    test('should handle multiple emails in one test', function(done) {
+        var emailDone = function() {
+            emailDone = done;
+        };
+
+        var email = {
+            to: Faker.Internet.email(),
+            text: Faker.Lorem.sentence(),
+            subject: Faker.Lorem.sentence()
+        };
+        mockMailer.mock(email, function() {
+            emailDone();
+        });
+
+        var email2 = {
+            to: Faker.Internet.email(),
+            text: Faker.Lorem.sentence(),
+            subject: Faker.Lorem.sentence()
+        };
+        mockMailer.mock(email2, function() {
+            emailDone();
+        });
+
+        transport.sendMail(email, function() {});
+        transport.sendMail(email2, function() {});
+    });
+
+    test('should handle multiple identical emails in one test', function(done) {
+        var emailDone = function() {
+            emailDone = done;
+        };
+
+        var email = {
+            to: Faker.Internet.email(),
+            text: Faker.Lorem.sentence(),
+            subject: Faker.Lorem.sentence()
+        };
+        mockMailer.mock(email, function() {
+            emailDone();
+        });
+        mockMailer.mock(email, function() {
+            emailDone();
+        });
+
+        transport.sendMail(email, function() {});
+        transport.sendMail(email, function() {});
     });
 
 });
