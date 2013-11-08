@@ -7,7 +7,7 @@ var _ = require('lodash'),
     mockMailer = require('../index'),
     transport = nodemailer.createTransport('Sendmail', '/usr/sbin/sendmail');
 
-suite('mock-nodemailer', function() {
+suite('expectEmail-nodemailer', function() {
 
     test('should handle correct email, as object', function(done) {
         var email = {
@@ -16,7 +16,7 @@ suite('mock-nodemailer', function() {
             subject: Faker.Lorem.sentence()
         };
 
-        mockMailer.mock(email, done);
+        mockMailer.expectEmail(email, done);
 
         transport.sendMail(email, function() {});
     });
@@ -28,7 +28,7 @@ suite('mock-nodemailer', function() {
             subject: Faker.Lorem.sentence()
         };
 
-        mockMailer.mock(function(sentEmail) {
+        mockMailer.expectEmail(function(sentEmail) {
             return _.isEqual(email, sentEmail);
         }, done);
 
@@ -47,7 +47,7 @@ suite('mock-nodemailer', function() {
             subject: Faker.Lorem.sentence()
         };
 
-        mockMailer.mock(function(sentEmail) {
+        mockMailer.expectEmail(function(sentEmail) {
             return _.isEqual(email, sentEmail);
         }, done);
 
@@ -65,7 +65,7 @@ suite('mock-nodemailer', function() {
             subject: Faker.Lorem.sentence()
         };
 
-        mockMailer.mock(5, function(sentEmail) {
+        mockMailer.expectEmail(5, function(sentEmail) {
             return _.isEqual(email, sentEmail);
         }, done);
 
@@ -81,7 +81,7 @@ suite('mock-nodemailer', function() {
             subject: Faker.Lorem.sentence()
         };
 
-        mockMailer.mock(5, email, done);
+        mockMailer.expectEmail(5, email, done);
 
         _.times(5, function(i) {
             setTimeout(function() {
@@ -97,7 +97,7 @@ suite('mock-nodemailer', function() {
             subject: Faker.Lorem.sentence()
         };
 
-        mockMailer.mock(email, done);
+        mockMailer.expectEmail(email, done);
 
         setTimeout(function() {
             transport.sendMail(email, function() {});
@@ -111,7 +111,7 @@ suite('mock-nodemailer', function() {
             subject: Faker.Lorem.sentence()
         };
 
-        mockMailer.mock(email, done);
+        mockMailer.expectEmail(email, done);
 
         transport.sendMail(email, function() {});
 
@@ -130,7 +130,7 @@ suite('mock-nodemailer', function() {
             text: Faker.Lorem.sentence(),
             subject: Faker.Lorem.sentence()
         };
-        mockMailer.mock(email, function() {
+        mockMailer.expectEmail(email, function() {
             emailDone();
         });
 
@@ -139,7 +139,7 @@ suite('mock-nodemailer', function() {
             text: Faker.Lorem.sentence(),
             subject: Faker.Lorem.sentence()
         };
-        mockMailer.mock(email2, function() {
+        mockMailer.expectEmail(email2, function() {
             emailDone();
         });
 
@@ -157,10 +157,10 @@ suite('mock-nodemailer', function() {
             text: Faker.Lorem.sentence(),
             subject: Faker.Lorem.sentence()
         };
-        mockMailer.mock(email, function() {
+        mockMailer.expectEmail(email, function() {
             emailDone();
         });
-        mockMailer.mock(email, function() {
+        mockMailer.expectEmail(email, function() {
             emailDone();
         });
 
@@ -175,7 +175,7 @@ suite('mock-nodemailer', function() {
             subject: Faker.Lorem.sentence()
         };
 
-        mockMailer.mock(email, done);
+        mockMailer.expectEmail(email, done);
 
         transport.sendMail(email, function(error) {
             assert.strictEqual(null, error);
@@ -189,7 +189,7 @@ suite('mock-nodemailer', function() {
             subject: Faker.Lorem.sentence()
         };
 
-        mockMailer.mock(email, done);
+        mockMailer.expectEmail(email, done);
 
         transport.sendMail(email, function(error, response) {
             assert(response, 'callback gets a response');
