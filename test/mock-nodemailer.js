@@ -5,7 +5,7 @@ var _ = require('lodash'),
     Faker = require('Faker'),
     assert = require('assert'),
     mockMailer = require('../index'),
-    transport = nodemailer.createTransport('Sendmail', '/usr/sbin/sendmail');
+    transport = nodemailer.createTransport('Sendmail', '');
 
 suite('expectEmail-nodemailer', function() {
 
