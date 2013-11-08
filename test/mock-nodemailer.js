@@ -29,8 +29,7 @@ suite('mock-nodemailer', function() {
         };
 
         mockMailer.mock(function(sentEmail) {
-            assert.deepEqual(email, sentEmail);
-            return true;
+            return _.isEqual(email, sentEmail);
         }, done);
 
         transport.sendMail(email, function() {});
@@ -50,30 +49,6 @@ suite('mock-nodemailer', function() {
 
         mockMailer.mock(function(sentEmail) {
             return _.isEqual(email, sentEmail);
-        }, done);
-
-        assert.throws(function() {
-            transport.sendMail(email2, function() {});
-        }, /incorrect email/);
-
-        done();
-    });
-
-    test('should throw with incorrect email, throwing an error', function(done) {
-        var email = {
-            to: Faker.Internet.email(),
-            text: Faker.Lorem.sentence(),
-            subject: Faker.Lorem.sentence()
-        };
-        var email2 = {
-            to: Faker.Internet.email(),
-            text: Faker.Lorem.sentence(),
-            subject: Faker.Lorem.sentence()
-        };
-
-        mockMailer.mock(function(sentEmail) {
-            assert.deepEqual(email, sentEmail);
-            return true;
         }, done);
 
         assert.throws(function() {
