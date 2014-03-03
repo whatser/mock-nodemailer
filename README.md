@@ -16,7 +16,7 @@ Usage
             subject: Faker.Lorem.sentence()
         };
 
-        mockMailer.mock(email, done);
+        mockMailer.expectEmail(email, done);
 
         transport.sendMail(email, function() {});
 
@@ -47,7 +47,7 @@ Usage
             subject: Faker.Lorem.sentence()
         };
 
-        mockMailer.mock(function(sentEmail) {
+        mockMailer.expectEmail(function(sentEmail) {
             return _.isEqual(email, sentEmail);
         }, done);
 
@@ -63,7 +63,7 @@ Usage
             subject: Faker.Lorem.sentence()
         };
 
-        mockMailer.mock(5, function(sentEmail) {
+        mockMailer.expectEmail(5, function(sentEmail) {
             return _.isEqual(email, sentEmail);
         }, done);
 
